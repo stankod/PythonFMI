@@ -1,6 +1,9 @@
 import pdb
 import unittest
 from solution import gt, lt, pred, for_any, for_all, present, eq, oftype
+from sample_test_ek import *
+from  sample_test_np import *
+from sample_test_dh import *
 
 class PredicatesTest(unittest.TestCase):
     def test_simple_gt(self):
