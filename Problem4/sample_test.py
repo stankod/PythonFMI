@@ -50,7 +50,6 @@ class PredicatesTest(unittest.TestCase):
         self.assertFalse(oftype(float)(0))
         self.assertTrue(oftype(str)('5'))
         self.assertFalse(oftype(a)(b))
-        self.assertFalse(oftype(b)(a))
 
     def test_present(self):
         b = None
@@ -73,15 +72,15 @@ class PredicatesTest(unittest.TestCase):
 
     def test_and(self):
         self.assertTrue((gt(0) & lt(5))(3))
-        self.assertFalse((gt(0) & lt(5))(5))
+        self.assertFalse((lt(5) & gt(0))(5))
         self.assertFalse((gt(0) & lt(5))(0))
+        self.assertFalse((gt(0) & lt(0))(1))
+        self.assertFalse((gt(0) & lt(0))(-1))
+        self.assertFalse((gt(0) & lt(0))(0))
         self.assertTrue(( oftype(float) & gt(-1) & lt(10) & lt(9) & pred(lambda x: x%2) )(5.0))
         self.assertFalse(( oftype(float) & gt(-1) & lt(10) & lt(9) & pred(lambda x: x%2) )(5))
         self.assertFalse(( oftype(float) & gt(-1) & lt(10) & lt(9) & pred(lambda x: x%2) )(4.0))
         self.assertFalse(( oftype(float) & gt(-1) & lt(10) & lt(9) & pred(lambda x: x%2) )(-4.0))
-        self.assertFalse((gt(0) & lt(0))(1))
-        self.assertFalse((gt(0) & lt(0))(-1))
-        self.assertFalse((gt(0) & lt(0))(0))
 
     def test_and_intersection(self):
         self.assertTrue( ((lt(6) & gt(-5)) & (gt(4) & lt(10)))(5) )
@@ -115,6 +114,13 @@ class PredicatesTest(unittest.TestCase):
         not_integer = ~oftype(int)
         self.assertTrue(not_integer(1+1j))
         self.assertFalse(not_integer(1))
+
+    def test_for_any(self):
+        self.assertTrue(for_any(gt(0), lt(1))(0))
+        self.assertFalse(for_any()(0))
+
+    def test_for_all(self):
+        self.assertTrue(for_all()(1))
 
 if __name__ == '__main__':
     unittest.main()

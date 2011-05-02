@@ -1,6 +1,6 @@
 import unittest
 from solution import gt, lt, pred, for_any,\
-                     for_all, present, eq, oftype
+                     for_all, present, eq, oftype, raising_predicate
 
 def even(n):
     if n % 2 == 0:
@@ -113,7 +113,7 @@ class TestPredicates(unittest.TestCase):
         self.assertFalse(some_predicate(-2))
         self.assertFalse(some_predicate(14))
 
-    @unittest.expectedFailure
+    #@unittest.expectedFailure
     def test_thrifty_conunction_and_disjunction(self):
         """Ако искате да тествате за това сменете raising_predicate
         с името на вашия 'хвърлящ' клас и го добавете в import-а"""
