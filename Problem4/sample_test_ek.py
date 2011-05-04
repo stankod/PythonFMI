@@ -1,6 +1,17 @@
 import unittest
 from solution import gt, lt, pred, for_any,\
-                     for_all, present, eq, oftype, raising_predicate
+                     for_all, present, eq, oftype
+
+class BadOperationError(BaseException): pass
+
+class raising_predicate:
+    def __init__(self, x):
+        pass
+
+    def __raise_error(self, *other):
+        raise BadOperationError("Shouldn't estimate")
+
+    __and__ = __rand__ = __or__ = __ror__ = __call__ = __raise_error
 
 def even(n):
     if n % 2 == 0:
