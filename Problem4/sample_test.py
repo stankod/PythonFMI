@@ -100,15 +100,19 @@ class PredicatesTest(unittest.TestCase):
             else:
                 self.assertTrue((gt(0) | lt(0))(i))
 
-    def test_neg(self):
+    def test_invert(self):
         negative = ~gt(0)
         positive = ~lt(0)
         negative2 = ~positive
+        positive2 = ~~~~positive
         self.assertTrue(negative(-1))
         self.assertFalse(negative(1))
         self.assertTrue(positive(1))
         self.assertFalse(positive(-1))
         self.assertTrue(negative2(-1))
+        self.assertFalse(negative2(1))
+        self.assertTrue(positive2(1))
+        self.assertFalse(positive2(-1))
         non = ~present()
         self.assertTrue(non(None))
         not_integer = ~oftype(int)
