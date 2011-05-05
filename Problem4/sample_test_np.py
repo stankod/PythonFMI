@@ -40,11 +40,11 @@ class MyTest(unittest.TestCase):
         self.assertFalse(pr(2))
 
     def test_and2(self):
-        pr = gt(2) & (lambda x: x < 4)
+        pr = gt(2) & pred(lambda x: x < 4)
         self.assertTrue(pr(3))
         self.assertFalse(pr(5))
         self.assertFalse(pr(2))
-        pr = (lambda x: x> 2) & lt(4)
+        pr = pred(lambda x: x> 2) & lt(4)
         self.assertTrue(pr(3))
         self.assertFalse(pr(5))
         self.assertFalse(pr(2))
@@ -56,12 +56,12 @@ class MyTest(unittest.TestCase):
         self.assertFalse(pr(0))
 
     def test_or2(self):
-        pr = oftype(str) | (lambda x: x >0)
+        pr = oftype(str) | pred(lambda x: x >0)
         self.assertTrue(pr(10))
         self.assertTrue(pr('fds'))
         self.assertFalse(pr(0))
 
-        pr = (lambda x: isinstance(x, str)) | gt(0)
+        pr = pred(lambda x: isinstance(x, str)) | gt(0)
         self.assertTrue(pr(10))
         self.assertTrue(pr('fds'))
         self.assertFalse(pr(0))
@@ -79,12 +79,12 @@ class MyTest(unittest.TestCase):
         self.assertFalse(pr(41))
 
     def test_implication2(self):
-        pr = oftype(int) >> (lambda x: x > 41)
+        pr = oftype(int) >> pred(lambda x: x > 41)
         self.assertTrue(pr(42))
         self.assertTrue(pr('fdfsd'))
         self.assertFalse(pr(41))
 
-        pr = (lambda x: isinstance(x, int)) >> gt(41)
+        pr = pred(lambda x: isinstance(x, int)) >> gt(41)
         self.assertTrue(pr(42))
         self.assertTrue(pr('fdfsd'))
         self.assertFalse(pr(41))
