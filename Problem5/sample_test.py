@@ -1,5 +1,7 @@
 import unittest
 from solution import *
+from sample_test_dh import *
+from sample_test_ad import *
 
 class FifthHomeworkSimpleTests(unittest.TestCase):
     def test_tokenize(self):
