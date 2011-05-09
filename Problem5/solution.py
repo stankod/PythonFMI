@@ -3,33 +3,14 @@ import re
 number = r'\d+\.?\d*|\d*\.?\d+'
 string = r'\".*\"'
 tokens_rest = r"[\(\)']|#t|#f"
-special_symbol = re.escape(r'!$%&*+-./:<=>?@^_~')
 special_symbol = r'\!\$\%\&\*\+\-\.\/\:\<\=\>\?\@\^\_\~'
 special_symbol = r'!%&-/:<=>@_~\$\*\+\.\?\^'
+special_symbol = re.escape(r'!$%&*+-./:<=>?@^_~')
 identifier = r'\A[a-zA-Z][{1}a-zA-Z{0}]*|\B[{0}]\B'.format(special_symbol, number)
-identifier = r'\b[a-zA-Z][a-zA-Z{0}{1}]*|(?=\W|^)[{0}](?=\W|$)?|\b_'.format(special_symbol, number)
-
-def match_token(token, code):
-    return re.findall(token, code)
-
-def match_all_tokens(code):
-    matched = []
-    for expression in code:
-        for token in [identifier, string, number, tokens_rest]:
-            m = match_token(token, expression)
-            if m:
-                for x in m:
-                    matched.append(x)
-                break
-    return matched
+identifier = r'\b[a-zA-Z][a-zA-Z0-9{0}]*|(?=\W|^)[{0}](?=\W|$)?|\b_'.format(special_symbol)
 
 def tokenize(code):
-    return match_all_tokens(code.split(' '))
-
-def tokenize(code):
-    tokens = re.findall(r'|'.join([tokens_rest,\
-            number, string, identifier]), code)
-    tokens = re.findall(identifier, code)
+    tokens = re.findall(r'|'.join([tokens_rest, string, number, identifier]), code)
     return tokens
 
 def identifiers(tokens):
