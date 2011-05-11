@@ -1,13 +1,16 @@
 import re
 
 number = r'\d+\.?\d*|\d*\.?\d+'
-string = r'\".*\"'
+string = r'\".*\"|\'.*\''
 tokens_rest = r"[\(\)']|#t|#f"
 special_symbol = r'\!\$\%\&\*\+\-\.\/\:\<\=\>\?\@\^\_\~'
 special_symbol = r'!%&-/:<=>@_~\$\*\+\.\?\^'
 special_symbol = re.escape(r'!$%&*+-./:<=>?@^_~')
 identifier = r'\A[a-zA-Z][{1}a-zA-Z{0}]*|\B[{0}]\B'.format(special_symbol, number)
 identifier = r'\b[a-zA-Z][a-zA-Z0-9{0}]*|(?=\W|^)[{0}](?=\W|$)?|\b_'.format(special_symbol)
+
+def decompose_code(code):
+    pass
 
 def tokenize(code):
     tokens = re.findall(r'|'.join([tokens_rest, string, number, identifier]), code)
