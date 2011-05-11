@@ -41,7 +41,7 @@ class FifthHomeworkSimpleTests(unittest.TestCase):
 
     def test_tokenize_recognizes_dotted_numbers(self):
         code = '123 .123 1.23 12.3 123. 1.2.3'
-        expected = ['123', '.123', '1.23', '12.3', '123.']
+        expected = ['123', '.123', '1.23', '12.3', '123.', '1.2', '.3']
         self.assertEqual(expected, tokenize(code))
 
     def test_tokenize_recognizes_numbers_alone(self):
