@@ -1,7 +1,7 @@
 import unittest
 from solution import *
 
-class FifthHomeworkSimpleTests(unittest.TestCase):
+class FifthHomeworkSimpleTests_ki(unittest.TestCase):
     def test_tokenize(self):
         self.assertEqual(['(', 'times', '3', '"spam"', ')'], tokenize('(times 3 "spam")'))
         self.assertEqual(['(','+','123','"eggs"',')'], tokenize('(+ 123 "eggs")'))

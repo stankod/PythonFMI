@@ -39,6 +39,10 @@ class FifthHomeworkSimpleTests(unittest.TestCase):
         code = '1nc0rr3c7 c*rrec7+_^ A1s0-c0rRecT in,correct'
         self.assertEqual(expected, tokenize(code))
 
+    def test_identifiers_ignores_strings(self):
+        self.assertEqual({'spam'},
+        identifiers(tokenize('spam "Spam" "SPAM" sPaM \"spam\"')))
+
     def test_tokenize_recognizes_dotted_numbers(self):
         code = '123 .123 1.23 12.3 123. 1.2.3'
         expected = ['123', '.123', '1.23', '12.3', '123.', '1.2', '.3']

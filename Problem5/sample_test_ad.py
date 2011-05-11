@@ -17,7 +17,6 @@ class LispTokenizeTests(unittest.TestCase):
     def test_case_sensitive(self):
         self.assertEqual('(spam "SPAM")', case_sensitive('(Spam "SPAM")', {'spam'}))
 
-    @unittest.skip('too long')
     def test_real_scheme_code(self):
         old_code = """\
 (define (software-type) 'MS-DOS)
