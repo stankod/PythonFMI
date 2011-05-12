@@ -14,7 +14,8 @@ class FifthHomeworkSimpleTests_dh(unittest.TestCase):
         self.assertEqual(['(','+','123','"eggs"',')'], tokenize('(+ 123 "eggs")'))  
 
     def test_tokenize_with_inner_quotes(self):
-        self.assertEqual(['(','quote','(','"This is quote \""',')',')'], tokenize('(quote ("This is quote \""))'))
+        self.assertEqual(['(','quote','(','"This is quote \""',')',')'],
+                tokenize('(quote ("This is quote \""))'))
     
     def test_identifiers(self):
         self.assertEqual({'sum', 'number'}, identifiers(['(', 'sum', '42', 'number', 'NUMBER', ')']))
@@ -35,7 +36,8 @@ class FifthHomeworkSimpleTests_dh(unittest.TestCase):
         self.assertEqual('(mul number1 Number2)', case_sensitive('(mul NumbEr1 Number2)', {'number','number1'}))
 
     def test_case_sensitive_with_quotes(self):
-        self.assertEqual('(string "String" "stRing" "STRING" "\"StRiNg\"")', case_sensitive('(String "String" "stRing" "STRING" "\"StRiNg\"")', {'string'}))
+        self.assertEqual('(string "String" "stRing" "STRING" "\"StRiNg\"")',
+                case_sensitive('(String "String" "stRing" "STRING" "\"StRiNg\"")', {'string'}))
         self.assertEqual('(spam "SPAM" number number number)', case_sensitive('(Spam "SPAM" Number nUmber NUMBER)', {'spam','number'}))
         
         

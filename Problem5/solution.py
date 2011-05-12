@@ -23,11 +23,9 @@ def identifiers(tokens):
 def case_sensitive(code, identifs):
     def replace_identifier(expr):
         ident = expr.group()
-        if replacements.get(ident.lower()):
-            return replacements[ident.lower()]
-        else:
-            return ident
-
+        return replacements[ident.lower()]\
+            if replacements.get(ident.lower())\
+            else ident
     replacements = {iden.lower() : iden for iden in identifs}
     code = re.sub(r'({0})|{1}'.format(_identifier, _string), replace_identifier, code)
     return code
