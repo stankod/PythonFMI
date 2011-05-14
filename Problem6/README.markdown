@@ -76,4 +76,4 @@
     spam.eggs('x', 420) # 2
     spam.eggs('x', 'x') # 3
     spam.eggs(1.0, 'x') # 4
-    spem.eggs(1.0, 1.0) # 5
+    spem.eggs(1.0, 1.0) # 4?
