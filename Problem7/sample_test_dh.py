@@ -126,24 +126,23 @@ class CustomInterfaceTest(unittest.TestCase):
         self.assertEqual('Interface method foo', klass.foo.__doc__)
         self.assertEqual('Class method bar', klass.bar.__doc__)
         
-    #@unittest.expectedFailure    
     def test_for_bash_maistors(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             class iface(metaclass=interface):
                 def foo(self, a, b):
                     return a+b
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             class iface(metaclass=interface):
                 def foo(self, a, b):
                     c=a+b
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             class iface(metaclass=interface):
                 def foo(self, a, b):
                     print(a)
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             class iface(metaclass=interface):
                 def foo(self, a, b):
                     a>b

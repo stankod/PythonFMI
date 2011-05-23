@@ -77,7 +77,7 @@ class InterfaceTestEK(unittest.TestCase):
             class non_methods(metaclass = interface):
                 var1 = 7
 
-    @unittest.expectedFailure
+    #@unittest.expectedFailure
     def test_raise_if_method_has_implementaion_in_interface(self):
         with self.assertRaises(AssertionError):
             class ifce_impl(metaclass = interface):
