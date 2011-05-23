@@ -1,68 +1,57 @@
+import re
 from inspect import getfullargspec as argspec
 
 class interface(type):
     def __new__(cls, name, bases, _dict):
-        cls._check_if_public(_dict)
+        [cls._assert_public_attribute(attr) for attr in _dict]
         cls._check_if_not_method(_dict)
-        methods = {k:v for k, v in _dict.items() if callable(v)}
-        cls._methods_implemented(methods)
-        _dict['__new__'] = cls.init_interface
-        result = type.__new__(cls, name, bases, _dict)
-        result.__methods = methods
-        return result
+        cls._methods_implemented([v for v in _dict.values() if callable(v)])
 
-    def init_interface(self, klass):
-        klass_methods = [k for k, v in klass.__dict__.items() if callable(v)]
-        klass_methods = sorted(klass_methods)
-        intf_methods = sorted(self.__methods.keys())
-        if not all([intf_m in klass_methods for intf_m in intf_methods]):
-            raise AssertionError('different attributes:\nInterface:\
-            {0}\nClass:\
-            {1}.'.format(set(self.__methods.keys()),set(klass_methods)))
-        for cls_method, intf_method in zip(klass_methods, intf_methods):
-            intf_spec = argspec(self.__methods[intf_method])
-            cls_spec = argspec(klass.__dict__[cls_method])
-            intf_args = intf_spec.args
-            cls_args = cls_spec.args
+        _dict['__new__'] = cls.check_implementation
+        return type.__new__(cls, name, bases, _dict)
 
-            if self.__methods[intf_method].__doc__ != None and\
-                    klass.__dict__[cls_method].__doc__ == None:
-                klass.__dict__[cls_method].__doc__ = self.__methods[intf_method].__doc__
+    def check_implementation(self, klass):
+        klass_methods = {k for k, v in klass.__dict__.items() if callable(v)}
+        intf_methods = {k for k, v in self.__dict__.items() if callable(v)}
 
-            if not (cls_args == intf_args):
-                raise AssertionError('different arguments:\nInterface:\
-                        {0} for {1}\nClass: {2} for {3}.'.format(intf_args,
-                            intf_method, cls_args, cls_method))
+        if not ( intf_methods <= klass_methods ):
+            raise AssertionError(\
+                'Methods not implemented:\n{0}.'.format(set(intf_methods)-set(klass_methods)))
+
+        for method in intf_methods:
+            intf_spec = argspec(self.__dict__[method])
+            cls_spec = argspec(klass.__dict__[method])
+
+            if self.__dict__[method].__doc__ != None and\
+                    klass.__dict__[method].__doc__ == None:
+                klass.__dict__[method].__doc__ = self.__dict__[method].__doc__
+
+            if not (cls_spec.args == intf_spec.args):
+                raise AssertionError('Different arguments:\nInterface:\
+                        {0} for {1}\nClass: {2} for {3}.'.format(intf_spec.args,
+                            method, cls_spec.args, method))
 
             if intf_spec.varargs != cls_spec.varargs:
-                        raise AssertionError('varargs missing in method\
-                                {0}.'.format(cls_method))
+                        raise AssertionError('varargs missing in method {0}.'.format(method))
 
             if intf_spec.varkw != cls_spec.varkw:
-                        raise AssertionError('kwargs  missing in method\
-                                {0}.'.format(cls_method))
+                        raise AssertionError('kwargs  missing in method {0}.'.format(method))
 
             if set(intf_spec.kwonlyargs) != set(cls_spec.kwonlyargs):
-                        raise AssertionError('kwonlyargs missing in method\
-                                {0}.'.format(cls_method))
-        return type.__new__(type(klass), klass.__name__, klass.__bases__,\
-                dict(klass.__dict__))
+                        raise AssertionError('kwonlyargs missing in method {0}.'.format(method))
+
+        return type.__new__(type(klass), klass.__name__, klass.__bases__, dict(klass.__dict__))
 
     def _check_if_not_method(_dict):
-        if not all([callable(v) for k, v in _dict.items() if k !=
-        '__module__']):
+        if not all([callable(v) for k, v in _dict.items() if k != '__module__']):
             raise AssertionError('Not all attributes are methods')
 
-    def _check_if_public(iterable):
-        def not_public(attribute):
-            if attribute.startswith('_') and\
-                    not ( attribute.startswith('__') and\
-                    attribute.endswith('__') ):
-                raise AssertionError('Not all attributes are public.')
-        [not_public(attr) for attr in iterable]
+    def _assert_public_attribute(attribute):
+        if re.match(r'^_[^_]\w*$', attribute):
+            raise AssertionError('Not all attributes are public.')
 
-    def _methods_implemented(_dict):
-        for k, v in _dict.items():
-            code = v.__code__.co_code
+    def _methods_implemented(methods):
+        for method in methods:
+            code = method.__code__.co_code
             if code != b'd\x00\x00S' and code != b'd\x01\x00S':
-                raise AssertionError('Implementation in interface')
+                raise AssertionError('Implementation of a method in the interface.')
