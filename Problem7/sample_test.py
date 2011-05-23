@@ -9,7 +9,7 @@ class MetaclassInterfaceTest(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             class eggs(metaclass=interface):
-                def __spam_end_spam(self): pass
+                def __spam(self): pass
 
         class spam(metaclass=interface):
             def __call__(self, *args): pass
@@ -200,7 +200,7 @@ class MetaclassInterfaceTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             class spam(metaclass=interface):
                 def foo(self):
-                    return 42
+                    return 42*2
 
         with self.assertRaises(AssertionError):
             class spam(metaclass=interface):
@@ -244,6 +244,18 @@ class InterfaceTest(unittest.TestCase):
         @spec
         class MyStack:
             def foo(self, arg: int): pass
+
+    def test_ignore_newly_implemented_methods(self):
+        class spam(metaclass=interface):
+            def foo(self): pass
+
+        @spam
+        class eggs:
+            def a_function(self, a):
+                print(a)
+
+            def foo(self): pass
+            def ultra_spam(self, *, a): pass
 
 if __name__ == '__main__':
     unittest.main()
