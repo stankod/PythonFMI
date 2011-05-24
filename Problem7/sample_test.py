@@ -200,7 +200,7 @@ class MetaclassInterfaceTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             class spam(metaclass=interface):
                 def foo(self):
-                    return 42*2
+                    return 42
 
         with self.assertRaises(AssertionError):
             class spam(metaclass=interface):
