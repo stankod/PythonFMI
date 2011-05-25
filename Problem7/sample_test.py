@@ -257,5 +257,31 @@ class InterfaceTest(unittest.TestCase):
             def foo(self): pass
             def ultra_spam(self, *, a): pass
 
+    def test_system_attributes_work(self):
+        class spam(metaclass=interface):
+            def __init__(self, value):
+                pass
+            def __call__(self, *args):
+                pass
+
+        with self.assertRaises(AssertionError):
+            @spam
+            class eggs:
+                def __init__(self, value): pass
+        with self.assertRaises(AssertionError):
+            @spam
+            class eggs:
+                def __init__(self): pass
+                def __call__(self): pass
+        @spam
+        class eggs:
+            def __init__(self, value):
+                self.val = value
+            def __call__(self, *args):
+                return self.val
+        v = 10
+        egg = eggs(v)
+        self.assertEqual(v, egg())
+
 if __name__ == '__main__':
     unittest.main()
