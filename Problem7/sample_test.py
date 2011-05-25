@@ -283,5 +283,20 @@ class InterfaceTest(unittest.TestCase):
         egg = eggs(v)
         self.assertEqual(v, egg())
 
+    def test_interface_inheritance(self):
+        class spam(metaclass=interface):
+            def a(self): pass
+        class eggs(spam):
+            def b(self, arg): pass
+
+        with self.assertRaises(AssertionError):
+            @eggs
+            class foo:
+                def a(self): pass
+        with self.assertRaises(AssertionError):
+            @eggs
+            class foo:
+                def b(self, arg): pass
+
 if __name__ == '__main__':
     unittest.main()
