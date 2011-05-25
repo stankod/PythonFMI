@@ -41,7 +41,10 @@ class interface(type):
         return type.__new__(type(klass), klass.__name__, klass.__bases__, dict(klass.__dict__))
 
     def _check_if_not_method(_dict):
-        if not all([callable(v) for k, v in _dict.items() if k != '__module__']):
+        nonmethod_exceptions = [k for k, v in type('a', (object,),\
+            {}).__dict__.items() if not callable(v)]
+        if not all([callable(v) for k, v in _dict.items() if k not in\
+            nonmethod_exceptions]):
             raise AssertionError('Not all attributes are methods')
 
     def _assert_public_attribute(attribute):
