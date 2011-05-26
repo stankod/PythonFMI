@@ -15,7 +15,7 @@ class interface(type):
         intf_methods = {k for k, v in self.__dict__.items() if callable(v)}
         if not intf_methods <= klass_methods:
             raise AssertionError(\
-                'Methods not implemented:\n{0}.'.format(set(intf_methods)-set(klass_methods)))
+                'Methods not implemented:\n{0}.'.format(intf_methods-klass_methods))
 
         for method in intf_methods:
             intf_spec = argspec(self.__dict__[method])
@@ -29,10 +29,10 @@ class interface(type):
                         {0} for {1}\nClass: {2} for {3}.'.format(intf_spec.args,
                             method, cls_spec.args, method))
 
-            if intf_spec.varargs != cls_spec.varargs:
+            if bool(intf_spec.varargs)^bool(cls_spec.varargs):
                         raise AssertionError('varargs missing in method {0}.'.format(method))
 
-            if intf_spec.varkw != cls_spec.varkw:
+            if bool(intf_spec.varkw)^bool(cls_spec.varkw):
                         raise AssertionError('kwargs  missing in method {0}.'.format(method))
 
             if set(intf_spec.kwonlyargs) != set(cls_spec.kwonlyargs):
@@ -42,8 +42,7 @@ class interface(type):
 
     def _check_if_not_method(_dict):
         nonmethod_exceptions = ['__locals__', '__module__', '__doc__']
-        if not all([callable(v) for k, v in _dict.items() if k not in\
-            nonmethod_exceptions]):
+        if not all([callable(v) for k, v in _dict.items() if k not in nonmethod_exceptions]):
             raise AssertionError('Not all attributes are methods')
 
     def _assert_public_attribute(attribute):

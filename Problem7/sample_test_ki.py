@@ -179,7 +179,7 @@ class InterfaceTestKI(unittest.TestCase):
                 def m3(self):
                     pass
 
-    def test_complaining_for_having_list_args_with_different_names(self):
+    def test_not_complaining_for_having_list_args_with_different_names(self):
         class intf(metaclass=interface):
             def m1(self, a, b, c, *args):
                  pass
@@ -188,25 +188,23 @@ class InterfaceTestKI(unittest.TestCase):
             def m3(self):
                 pass
 
-        with self.assertRaises(AssertionError):
-            @intf
-            class klass(metaclass=interface):
-                def m1(self, a, b, c, *aargs):
-                    """Pops the stack head"""
-                def m2(self, b, c, *la):
-                    pass
-                def m3(self):
-                    pass
+        @intf
+        class klass(metaclass=interface):
+            def m1(self, a, b, c, *aargs):
+                """Pops the stack head"""
+            def m2(self, b, c, *la):
+                pass
+            def m3(self):
+                pass
 
-        with self.assertRaises(AssertionError):
-            @intf
-            class klass2(metaclass=interface):
-                def m1(self, a, b, c, *args):
-                    """Pops the stack head"""
-                def m2(self, c, b, *al):
-                    pass
-                def m3(self):
-                    pass
+        @intf
+        class klass2(metaclass=interface):
+            def m1(self, a, b, c, *args):
+                """Pops the stack head"""
+            def m2(self, b, c, *al):
+                pass
+            def m3(self):
+                pass
 
     def test_not_complaining_with_correct_list_args(self):
         class intf(metaclass=interface):
@@ -285,7 +283,7 @@ class InterfaceTestKI(unittest.TestCase):
                 def m3(self):
                     pass
 
-    def test_complaining_for_having_keyword_args_with_different_names(self):
+    def test_not_complaining_for_having_keyword_args_with_different_names(self):
         class intf(metaclass=interface):
             def m1(self, a, b, c, **kwargs):
                 pass
@@ -294,25 +292,23 @@ class InterfaceTestKI(unittest.TestCase):
             def m3(self):
                 pass
 
-        with self.assertRaises(AssertionError):
-            @intf
-            class klass(metaclass=interface):
-                def m1(self, a, b, c, **aargs):
-                    """Pops the stack head"""
-                def m2(self, b, c, **la):
-                    pass
-                def m3(self):
-                    pass
+        @intf
+        class klass(metaclass=interface):
+            def m1(self, a, b, c, **aargs):
+                """Pops the stack head"""
+            def m2(self, b, c, **la):
+                pass
+            def m3(self):
+                pass
 
-        with self.assertRaises(AssertionError):
-            @intf
-            class klass2(metaclass=interface):
-                def m1(self, a, b, c, **args):
-                    """Pops the stack head"""
-                def m2(self, c, b, **al):
-                    pass
-                def m3(self):
-                    pass
+        @intf
+        class klass2(metaclass=interface):
+            def m1(self, a, b, c, **args):
+                """Pops the stack head"""
+            def m2(self, b, c, **al):
+                pass
+            def m3(self):
+                pass
 
     def test_not_complaining_with_correct_keyword_args(self):
         class intf(metaclass=interface):

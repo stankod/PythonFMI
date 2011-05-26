@@ -92,6 +92,10 @@ class MetaclassInterfaceTest(unittest.TestCase):
         class eggs:
             def foo(self, *args): pass
 
+        @spam
+        class eggs:
+            def foo(self, *arg): pass
+
     def test_complain_if_taking_varargs_but_not_defined(self):
         class more_spam(metaclass=interface):
             def foo(self): pass
@@ -112,6 +116,10 @@ class MetaclassInterfaceTest(unittest.TestCase):
         @spam
         class eggs:
             def foo(self, **kwargs): pass
+
+        @spam
+        class eggs:
+            def foo(self, **kwarg): pass
 
     def test_complain_if_taking_kwargs_but_not_defined(self):
         class more_spam(metaclass=interface):
@@ -159,10 +167,12 @@ class MetaclassInterfaceTest(unittest.TestCase):
     def test_doc_string_is_overriden(self):
         class spam(metaclass=interface):
             def more_spam(self):
-                "Spam, spam and spam"
+                'Spam, spam and spam'
 
             def even_more_spam(self):
-                "Nobody expects the Spanish Inquisition!"
+                """
+                Nobody expects the Spanish Inquisition!
+                """
 
         @spam
         class eggs:
@@ -170,7 +180,7 @@ class MetaclassInterfaceTest(unittest.TestCase):
                 return 42
 
             def even_more_spam(self):
-                "Something completely different"
+                r"Something completely different"
 
         self.assertEqual("Spam, spam and spam", eggs().more_spam.__doc__)
         self.assertEqual("Something completely different", eggs().even_more_spam.__doc__)
@@ -206,44 +216,6 @@ class MetaclassInterfaceTest(unittest.TestCase):
             class spam(metaclass=interface):
                 def foo(self):
                     double_spam = "spam"*2
-
-class InterfaceTest(unittest.TestCase):
-    def test_add_missing_docstring(self):
-        class stack(metaclass=interface):
-            def pop(self):
-                """Pops the stack head"""
-
-        @stack
-        class MyStack:
-            def pop(self):
-                pass
-
-        self.assertEqual("Pops the stack head", MyStack.pop.__doc__)
-
-    def test_complains_for_different_number_of_arguments(self):
-        class spec(metaclass=interface):
-            def foo(self, a): pass
-
-        with self.assertRaises(AssertionError):
-            @spec
-            class MyStack:
-                def foo(self, a, b): pass
-
-    def test_does_not_complain_when_same_kwonly_args_but_in_different_order(self):
-        class spec(metaclass=interface):
-            def foo(self, *, a, b): pass
-
-        @spec
-        class MyStack:
-            def foo(self, *, b, a): pass
-
-    def test_does_not_complain_when_different_annotations(self):
-        class spec(metaclass=interface):
-            def foo(self, arg): pass
-
-        @spec
-        class MyStack:
-            def foo(self, arg: int): pass
 
     def test_ignore_newly_implemented_methods(self):
         class spam(metaclass=interface):
@@ -282,6 +254,44 @@ class InterfaceTest(unittest.TestCase):
         v = 10
         egg = eggs(v)
         self.assertEqual(v, egg())
+
+class InterfaceTest(unittest.TestCase):
+    def test_add_missing_docstring(self):
+        class stack(metaclass=interface):
+            def pop(self):
+                """Pops the stack head"""
+
+        @stack
+        class MyStack:
+            def pop(self):
+                pass
+
+        self.assertEqual("Pops the stack head", MyStack.pop.__doc__)
+
+    def test_complains_for_different_number_of_arguments(self):
+        class spec(metaclass=interface):
+            def foo(self, a): pass
+
+        with self.assertRaises(AssertionError):
+            @spec
+            class MyStack:
+                def foo(self, a, b): pass
+
+    def test_does_not_complain_when_same_kwonly_args_but_in_different_order(self):
+        class spec(metaclass=interface):
+            def foo(self, *, a, b): pass
+
+        @spec
+        class MyStack:
+            def foo(self, *, b, a): pass
+
+    def test_does_not_complain_when_different_annotations(self):
+        class spec(metaclass=interface):
+            def foo(self, arg): pass
+
+        @spec
+        class MyStack:
+            def foo(self, arg: int): pass
 
 if __name__ == '__main__':
     unittest.main()
