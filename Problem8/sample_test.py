@@ -60,10 +60,18 @@ class CollectionTest(unittest.TestCase):
         self.assertSongs([2, 3, 8, 12, 17, 18, 20, 23], tags={'popular'})
         self.assertSongs([1], tags={'fast'})
 
+    def test_name(self):
+        self.assertSongs([2], name='My Favourite Things')
+        self.assertSongs([23], name='Eine Kleine Nachtmusik')
+
+    def test_artist(self):
+        self.assertSongs([8, 9, 10, 11], artist='Miles Davis')
+
     def test_negative_tags(self):
         self.assertSongs([6], tags={'melancholic', 'avantgarde!'})
         self.assertSongs([17, 18, 23], tags={'popular', 'piano', 'jazz!', 'baroque!'})
 
+    @unittest.skip('')
     def test_find_subgenre(self):
         self.assertEqual(
             {'Baroque', 'Bebop'},
