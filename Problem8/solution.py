@@ -1,50 +1,80 @@
 import csv
-from collections import namedtuple
+from functools import reduce
 
-Song = namedtuple('Song', ['name', 'artist', 'genre', 'subgenre', 'tags'])
-Song.__hash__ = lambda self: (self.name, self.artist).__hash__()
+fields = ['name', 'artist', 'genre', 'subgenre', 'tags']
+class Song:
+    def __init__(self, name, artist, genre, subgenre, tags):
+        self.name = name
+        self.artist = artist
+        self.genre = genre
+        self.subgenre = subgenre
+        self.tags = tags
 
 class Collection:
     def __init__(self, file_contents_as_string, artist_tags):
-        fnames = ['name', 'artist', 'genre', 'tags']
+        fnames = [field for field in fields if field != 'subgenre']
         dial = csv.Sniffer().sniff(file_contents_as_string, delimiters=';')
         reader = csv.DictReader(file_contents_as_string.split('\n'), fieldnames=fnames, dialect=dial)
         self._songs = dict()
+        for attribute in fields:
+            self._songs[attribute] = dict()
         for entry in reader:
             song = self._build_song(entry, artist_tags)
-            self._songs[song] = song
+            for attribute in fields:
+                attr = song.__getattribute__(attribute)
+                if attr != None:
+                    if not isinstance(attr, (list, tuple, set)):
+                        attr = [attr]
+                    for element in attr:
+                        self._songs[attribute].setdefault(element, []).append(song)
 
     def _build_song(self, song_items, artist_tags):
         genre, *subgenre = map(str.strip, song_items['genre'].split(','))
         subgenre = None if not subgenre else subgenre[0]
         tags = set(map(str.strip, song_items['tags'].split(',')))
-        tags.union(artist_tags[song_items['artist']], genre)
-        tags.add(subgenre)
-        tags = tags - {None, ''}
+        tags.update(artist_tags[song_items['artist']])
+        tags.update({genre, subgenre})
+        tags -= {None, ''}
         return Song(song_items['name'], song_items['artist'], genre, subgenre, tags)
 
-    def _matcher(self, song, what):
-        for field in song._fields:
-            if what.get(field):
-                if field == 'tags':
-                    negative = {tag for tag in what['tags'] if tag.endswith('!')}
-                    what[field] = set(what[field]) - negative
-                    negative = {tag[:-1] for tag in negative}
-                    if not set(what[field]) <= getattr(song, field):
-                        return False
-                    if negative and negative <= getattr(song, field):
-                        return False
-                else:
-                    if what[field] != getattr(song, field):
-                        return False
-        return True
-
-
     def find(self, result, **what):
-        res = [v for k, v in self._songs.items()\
-                if self._matcher(v, what)]
+        sets, neg, res  = [], [], []
+        for k,v in what.items():
+            if k != 'filter':
+                if not isinstance(v, (list, tuple, set)):
+                    v = [v]
+                for attr in v:
+                    if isinstance(attr, str):
+                        if attr.endswith('!'):
+                            attr = attr[:-1]
+                            res_set = neg
+                        else:
+                            res_set = sets
+                        attr_key = [k for k in self._songs[k].keys() if k.lower() ==\
+                                attr.lower()][0]
+                        res_set.append(set(self._songs[k].get(attr_key, {})))
+                    else:
+                        songs = [set(v) for k,v in self._songs[k].items() if\
+                                attr.search(k)]
+                        songs = set(reduce(set.union, songs))
+                        sets.append(songs)
+            else:
+                if not isinstance(what['filter'], (list, set, tuple)):
+                    what['filter'] = [what['filter']]
+                sets.append({song for lst in self._songs['artist'] for song in\
+                self._songs['artist'][lst] if all([f(song) for f in\
+                    what['filter']])})
+
+        if sets:
+            res = list(reduce(set.intersection, sets))
+        if neg:
+            res = list(reduce(set.difference, neg, set(res)))
+
+        if len(what) == 0:
+            res = list({song for lst in self._songs['artist'] for song in\
+                self._songs['artist'][lst]})
 
         if result != 'songs':
-            res = list(set([getattr(song, result) for song in res]))
+            res = list(set([getattr(song, result) for song in res])-{None})
 
         return res
