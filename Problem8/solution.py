@@ -24,9 +24,9 @@ class Collection:
                 attr = song.__getattribute__(attribute)
                 if attr != None:
                     if not isinstance(attr, (list, tuple, set)):
-                        attr = [attr]
+                        attr = {attr}
                     for element in attr:
-                        self._songs[attribute].setdefault(element, []).append(song)
+                        self._songs[attribute].setdefault(element, {}).add(song)
 
     def _build_song(self, song_items, artist_tags):
         genre, *subgenre = map(str.strip, song_items['genre'].split(','))
@@ -52,7 +52,7 @@ class Collection:
                             res_set = sets
                         attr_key = [k for k in self._songs[k].keys() if k.lower() ==\
                                 attr.lower()][0]
-                        res_set.append(set(self._songs[k].get(attr_key, {})))
+                        res_set.append(self._songs[k].get(attr_key, {}))
                     else:
                         songs = [set(v) for k,v in self._songs[k].items() if\
                                 attr.search(k)]
