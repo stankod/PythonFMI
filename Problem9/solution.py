@@ -1,21 +1,41 @@
 import inspect
 from collections import OrderedDict
 
-class multimethod:
-    def __init__(self, function):
+class multidispatch(type):
+    def __new__(cls, name, bases, clsdict):
+        newdict = dict(clsdict)
+        for k, v in clsdict.items():
+            if isinstance(v, list) and all([callable(el) for el in v]):
+                newdict[k] = function_dispatch(*v)
+            elif callable(v):
+                newdict[k] = function_dispatch(v)
+        return type.__new__(cls, name, bases, newdict)
+
+    @classmethod
+    def __prepare__(metacls, name, bases):
+        class duplicate_key_dict(dict):
+            def __setitem__(self, key, value):
+                if key not in self:
+                    dict.__setitem__(self, key, value)
+                elif not isinstance(dict.__getitem__(self, key), list):
+                    dup_list = [dict.__getitem__(self, key), value]
+                    dict.__setitem__(self, key, dup_list)
+                else:
+                    dict.__getitem__(self, key).append(value)
+        return duplicate_key_dict()
+
+class function_dispatch:
+    def __init__(self, *functions):
         self._dispatch = OrderedDict()
-        self._add_function(function)
-        self.__name__ = function.__name__
+        for func in functions:
+            self._add_function(func)
 
     def __call__(self, *args, **kwargs):
         return self.__get__(self, type(self))(*args, **kwargs)
 
     def __get__(self, obj, owner=None):
-        if owner is None:
-            owner = type(obj)
         def dispatched_function(*args, **kwargs):
-            types = tuple(arg.__class__ for arg in args)
-            func = self._dispatch_arg_types(types)
+            func = self._dispatch_arg_types(tuple(arg.__class__ for arg in args))
             if func is None:
                 raise LookupError("No match found for the passed types.")
             if 'self' in inspect.getfullargspec(func).args:
@@ -25,26 +45,16 @@ class multimethod:
         return dispatched_function
 
     def _dispatch_arg_types(self, types):
-        if len(types) != len(list(self._dispatch.keys())[0]):
-            raise LookupError("Bad number of arguments passed.")
         for args in self._dispatch:
-            if all([issubclass(passed, arg) for arg, passed in zip(args, types)]):
-                return self._dispatch[args]
+            if len(types) == len(args):
+                if all([issubclass(passed, arg) for arg, passed in zip(args, types)]):
+                    return self._dispatch[args]
 
     def _get_function_arg_types(self, function):
         spec = inspect.getfullargspec(function)
-        args = [arg for arg in spec.args if arg != 'self']
-        return tuple(spec.annotations.get(arg, object) for arg in args)
+        return tuple(spec.annotations.get(arg, object) for arg in spec.args if arg != 'self')
 
     def _add_function(self, f):
         arg_types = self._get_function_arg_types(f)
-        if self._dispatch.get(arg_types):
-            raise LookupError("Function with same argument types already\
-            exists.")
-        self._dispatch[arg_types] = f
-
-    def multimethod(self, function):
-        if function.__name__ != self.__name__:
-            raise NameError("Function names don't match.")
-        self._add_function(function)
-        return self
+        if not self._dispatch.get(arg_types):
+            self._dispatch[arg_types] = f
