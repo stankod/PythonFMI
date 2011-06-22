@@ -64,7 +64,6 @@ class TestMultimethods(unittest.TestCase):
         with self.assertRaises(LookupError):
             self.s.sing(17)
 
-    @unittest.expectedFailure
     def test_type_error(self):
         with self.assertRaises(TypeError):
             @multimethod

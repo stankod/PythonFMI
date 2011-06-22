@@ -25,11 +25,10 @@ class multimethod:
         return dispatched_function
 
     def _dispatch_arg_types(self, types):
-        if len(types) != len(list(self._dispatch.keys())[0]):
-            raise LookupError("Bad number of arguments passed.")
         for args in self._dispatch:
-            if all([issubclass(passed, arg) for arg, passed in zip(args, types)]):
-                return self._dispatch[args]
+            if len(types) == len(args):
+                if all([issubclass(passed, arg) for arg, passed in zip(args, types)]):
+                    return self._dispatch[args]
 
     def _get_function_arg_types(self, function):
         spec = inspect.getfullargspec(function)
