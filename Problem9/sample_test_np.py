@@ -9,7 +9,7 @@ class MultiDispatchTestNP(unittest.TestCase):
 
         with self.assertRaises(LookupError):
             Spam().eggs(y=45.463, x=14.3)
-        #self.assertEqual(42, Spam().eggs(y='dsf',x=5))
+        self.assertEqual(42, Spam().eggs(y='dsf',x=5))
 
     def test_3(self):
         class Spam(metaclass=multidispatch):

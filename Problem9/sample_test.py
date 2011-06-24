@@ -2,8 +2,9 @@ import unittest
 from solution import multidispatch
 from sample_test_ek import *
 from sample_test_np import *
+from sample_test_pp import *
 
-class MultiDispatchTest(unittest.TestCase):
+class MultiDispatchTestMY(unittest.TestCase):
     def test_single_argument_two_independant_types(self):
         class Spam(metaclass=multidispatch):
             def __init__(self, value):
@@ -31,6 +32,19 @@ class MultiDispatchTest(unittest.TestCase):
 
         with self.assertRaises(LookupError):
             Spam().eggs('')
+
+    def test_dispatch_methods_defined_outside(self):
+        class Spam(metaclass=multidispatch):
+            def eggs(self, arg: float):
+                return 42.0
+
+        def eggs(self, arg: str):
+            return "42.0"
+
+        Spam.eggs = eggs
+
+        self.assertTrue(isinstance(Spam().eggs(12.5), float))
+        self.assertTrue(isinstance(Spam().eggs("blah"), str))
 
 if __name__ == '__main__':
     unittest.main()
