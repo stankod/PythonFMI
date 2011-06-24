@@ -3,26 +3,29 @@ from collections import OrderedDict
 
 class multidispatch(type):
     def __new__(cls, name, bases, clsdict):
-        newdict = dict(clsdict)
+        newdict = duplicate_key_dict()
         for k, v in clsdict.items():
             if isinstance(v, list) and all([callable(el) for el in v]):
                 newdict[k] = function_dispatch(*v)
             elif callable(v):
                 newdict[k] = function_dispatch(v)
+            else:
+                newdict[k] = v
         return type.__new__(cls, name, bases, newdict)
 
     @classmethod
     def __prepare__(metacls, name, bases):
-        class duplicate_key_dict(dict):
-            def __setitem__(self, key, value):
-                if key not in self:
-                    dict.__setitem__(self, key, value)
-                elif not isinstance(dict.__getitem__(self, key), list):
-                    dup_list = [dict.__getitem__(self, key), value]
-                    dict.__setitem__(self, key, dup_list)
-                else:
-                    dict.__getitem__(self, key).append(value)
         return duplicate_key_dict()
+
+class duplicate_key_dict(dict):
+    def __setitem__(self, key, value):
+        if key not in self:
+            dict.__setitem__(self, key, value)
+        elif not isinstance(dict.__getitem__(self, key), list):
+            dup_list = [dict.__getitem__(self, key), value]
+            dict.__setitem__(self, key, dup_list)
+        else:
+            dict.__getitem__(self, key).append(value)
 
 class function_dispatch:
     def __init__(self, *functions):
